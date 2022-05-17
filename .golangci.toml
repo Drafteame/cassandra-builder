@@ -1,0 +1,31 @@
+[run]
+timeout = "120s"
+skip-dirs = [
+    "bin",
+]
+
+[output]
+format = "colored-line-number"
+
+[linters]
+enable = [
+    "gocyclo",
+    "unconvert",
+    "goimports",
+    "unused",
+    "varcheck",
+    "vetshadow",
+    "misspell",
+    "nakedret",
+    "errcheck",
+    "golint",
+    "ineffassign",
+    "deadcode",
+    "goconst",
+    "vet",
+    "unparam",
+    "gofmt"
+]
+
+[issues]
+exclude-use-default = false
