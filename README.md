@@ -46,4 +46,4 @@ func main() {
 
 **Note**
 
-This repo is a fork from the github.com/Drafteame/cassandra-builder
+This repo is a fork from the https://github.com/danteay/go-cassandra
