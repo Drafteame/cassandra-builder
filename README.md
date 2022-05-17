@@ -23,12 +23,14 @@ import "github.com/Drafteame/cassandra-builder/qb"
 
 func main() {
     config := qb.Config{
-        Port:          9042,
-        KeyspaceName:  "test",
-        Username:      "",
-        Password:      "",
-        ContactPoints: []string{"127.0.0.1"},
-    }
+		Port:          9042,
+		KeyspaceName:  "test",
+		Username:      "cassandra",
+		Password:      "cassandra",
+		ContactPoints: []string{"127.0.0.1"},
+		Consistency:   qb.Quorum,
+		ProtoVersion:  4,
+	}
 
     client, err := qb.NewClient(config)
     if err != nil {
