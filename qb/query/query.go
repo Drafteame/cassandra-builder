@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"time"
 
 	"github.com/gocql/gocql"
 )
@@ -33,7 +34,8 @@ const (
 	Desc Order = "DESC"
 
 	// Asc represents ASC order filter
-	Asc Order = "ASC"
+	Asc            Order  = "ASC"
+	DatetimeLayout string = "2006-01-02 15:04:05.000Z"
 )
 
 // DefaultDebugPrint defines a default function that prints resultant query and arguments before being executed
@@ -113,6 +115,9 @@ func CastMapValue(mv interface{}, t reflect.Type, v reflect.Value) error {
 	case bool:
 		boolVal, _ := mv.(bool)
 		v.SetBool(boolVal)
+	case time.Time:
+		t, _ := time.Parse(DatetimeLayout, mv.(string))
+		v.Set(reflect.ValueOf(t))
 	default:
 		return fmt.Errorf("can't cast value of type %T with value %v, to type %v", mv, mv, t)
 	}
