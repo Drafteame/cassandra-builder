@@ -28,8 +28,9 @@ func main() {
 		Username:      "cassandra",
 		Password:      "cassandra",
 		ContactPoints: []string{"127.0.0.1"},
-		Consistency:   qb.Quorum,
+		onsistency:   qb.LocalQuorum,
 		ProtoVersion:  4,
+		CaPath:        "./certificate/sf-class2-root.crt",
 	}
 
     client, err := qb.NewClient(config)

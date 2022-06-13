@@ -86,8 +86,6 @@ func BindMapToStruct(m map[string]interface{}, st reflect.Value) error {
 		mv, ok := m[tagField]
 
 		if tagField != "" && ok {
-			fmt.Printf("map: %T field: %v\n", mv, field.Type)
-
 			err := CastMapValue(mv, field.Type, value)
 			if err != nil {
 				fmt.Printf("err: %v\n", err)
