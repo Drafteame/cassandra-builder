@@ -32,6 +32,17 @@ func NewClient(conf Config) (Client, error) {
 	return c, nil
 }
 
+// NewClientWithSession creates a new cassandra client manager from a given session.
+func NewClientWithSession(session *gocql.Session, conf Config) (Client, error) {
+	c := &client{session: session, debug: conf.Debug, printQuery: query.DefaultDebugPrint}
+
+	if conf.PrintQuery != nil {
+		c.printQuery = conf.PrintQuery
+	}
+
+	return c, nil
+}
+
 var _ Client = &client{}
 
 func (c *client) Select(f ...string) *qselect.Query {
