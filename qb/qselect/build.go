@@ -22,6 +22,10 @@ func (q *Query) build() string {
 		sb = sb.Limit(q.limit)
 	}
 
+	if q.allowFiltering {
+		sb = sb.AllowFiltering()
+	}
+
 	if len(q.orderBy) > 0 {
 		for _, column := range q.orderBy {
 			var order qb.Order = qb.DESC

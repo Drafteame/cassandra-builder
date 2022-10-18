@@ -7,16 +7,17 @@ import (
 
 // Query represents a cassandra select statement and his options
 type Query struct {
-	ctx     query.Query
-	fields  query.Columns
-	args    []interface{}
-	table   string
-	bind    interface{}
-	where   []query.WhereStm
-	groupBy query.Columns
-	orderBy query.Columns
-	order   query.Order
-	limit   uint
+	ctx            query.Query
+	fields         query.Columns
+	args           []interface{}
+	table          string
+	bind           interface{}
+	where          []query.WhereStm
+	groupBy        query.Columns
+	orderBy        query.Columns
+	order          query.Order
+	limit          uint
+	allowFiltering bool
 }
 
 // New create a new select query by passing a cassandra session and debug options
@@ -63,6 +64,12 @@ func (q *Query) GroupBy(f ...string) *Query {
 // Limit adds `limit` query statement
 func (q *Query) Limit(l uint) *Query {
 	q.limit = l
+	return q
+}
+
+// AllowFiltering sets a ALLOW FILTERING clause on the query.
+func (q *Query) AllowFiltering() *Query {
+	q.allowFiltering = true
 	return q
 }
 
