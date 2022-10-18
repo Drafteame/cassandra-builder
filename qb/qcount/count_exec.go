@@ -18,7 +18,7 @@ func (cq *Query) Exec() (int64, error) {
 		return 0, err
 	}
 
-	return 0, nil
+	return count, nil
 }
 
 func (cq *Query) build() string {
