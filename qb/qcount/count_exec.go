@@ -28,6 +28,10 @@ func (cq *Query) build() string {
 		q = q.Where(query.BuildWhere(cq.where)...)
 	}
 
+	if cq.allowFiltering {
+		q = q.AllowFiltering()
+	}
+
 	queryStr, _ := q.ToCql()
 
 	if cq.ctx.Debug {
