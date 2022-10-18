@@ -7,11 +7,12 @@ import (
 
 // Query create new select count query
 type Query struct {
-	ctx    query.Query
-	table  string
-	column string
-	where  []query.WhereStm
-	args   []interface{}
+	ctx            query.Query
+	table          string
+	column         string
+	where          []query.WhereStm
+	allowFiltering bool
+	args           []interface{}
 }
 
 // New create a new count query instance by passing a cassandra session
@@ -32,6 +33,12 @@ func (cq *Query) Column(c string) *Query {
 // From set table for count query
 func (cq *Query) From(t string) *Query {
 	cq.table = t
+	return cq
+}
+
+// AllowFiltering sets a ALLOW FILTERING clause on the query.
+func (cq *Query) AllowFiltering() *Query {
+	cq.allowFiltering = true
 	return cq
 }
 
