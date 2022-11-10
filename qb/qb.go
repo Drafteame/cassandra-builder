@@ -1,6 +1,8 @@
 package qb
 
 import (
+	"time"
+
 	"github.com/Drafteame/cassandra-builder/qb/query"
 
 	"github.com/Drafteame/cassandra-builder/qb/qcount"
@@ -27,17 +29,19 @@ const (
 
 // Config is the main cassandra configuration needed
 type Config struct {
-	Port                     int      `yaml:"port" json:"port"`
-	KeyspaceName             string   `yaml:"keyspace_name" json:"keyspace_name"`
-	Username                 string   `yaml:"username" json:"username"`
-	Password                 string   `yaml:"password" json:"password"`
-	ContactPoints            []string `yaml:"contact_points" json:"contact_points"`
-	Debug                    bool     `yaml:"debug" json:"debug"`
+	Port                     int           `yaml:"port" json:"port"`
+	KeyspaceName             string        `yaml:"keyspace_name" json:"keyspace_name"`
+	Username                 string        `yaml:"username" json:"username"`
+	Password                 string        `yaml:"password" json:"password"`
+	ContactPoints            []string      `yaml:"contact_points" json:"contact_points"`
+	Debug                    bool          `yaml:"debug" json:"debug"`
+	ProtoVersion             int           `yaml:"proto_version" json:"proto_version"`
+	Consistency              Consistency   `yaml:"consistency" json:"consistency"`
+	CaPath                   string        `yaml:"ca_path" json:"ca_path"`
+	DisableInitialHostLookup bool          `yaml:"disable_initial_host_lookup" json:"disable_initial_host_lookup"`
+	Timeout                  time.Duration `yaml:"timeout" json:"timeout"`
+	ConnectTimeout           time.Duration `yaml:"connect_timeout" json:"connect_timeout"`
 	PrintQuery               query.DebugPrint
-	ProtoVersion             int         `yaml:"proto_version" json:"proto_version"`
-	Consistency              Consistency `yaml:"consistency" json:"consistency"`
-	CaPath                   string      `yaml:"ca_path" json:"ca_path"`
-	DisableInitialHostLookup bool        `yaml:"disable_initial_host_lookup" json:"disable_initial_host_lookup"`
 }
 
 // Client is the main cassandra client abstraction to work with the database

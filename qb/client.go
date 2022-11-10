@@ -101,5 +101,13 @@ func getSession(c Config) (*gocql.Session, error) {
 		}
 	}
 
+	if c.Timeout != 0 {
+		cluster.Timeout = c.Timeout
+	}
+
+	if c.ConnectTimeout != 0 {
+		cluster.ConnectTimeout = c.ConnectTimeout
+	}
+
 	return cluster.CreateSession()
 }
