@@ -1,3 +1,10 @@
+## v0.5.2 (2023-01-30)
+
+
+- Merge pull request #8 from Drafteame/fix/bump-config
+- fix: cmd wrong folder
+- fix: cmd wrong folder
+
 ## v0.5.1 (2023-01-30)
 
 
