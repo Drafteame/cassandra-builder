@@ -1,3 +1,20 @@
+## v0.6.0 (2023-01-30)
+
+
+- Merge pull request #6 from Drafteame/dependabot/github_actions/magefile/mage-action-2.3.0
+- build(deps): bump magefile/mage-action from 2.1.0 to 2.3.0
+- build(deps): bump magefile/mage-action from 2.1.0 to 2.3.0
+- Bumps [magefile/mage-action](https://github.com/magefile/mage-action) from 2.1.0 to 2.3.0.
+- [Release notes](https://github.com/magefile/mage-action/releases)
+- [Commits](https://github.com/magefile/mage-action/compare/v2.1.0...v2.3.0)
+- ---
+updated-dependencies:
+- dependency-name: magefile/mage-action
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+...
+- Signed-off-by: dependabot[bot] <support@github.com>
+
 ## v0.5.3 (2023-01-30)
 
 
