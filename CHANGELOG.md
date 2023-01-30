@@ -1,3 +1,10 @@
+## v0.5.3 (2023-01-30)
+
+
+- Merge pull request #9 from Drafteame/fix/bump-config
+- ci: changes for goreleaser deprecations
+- ci: changes for goreleaser deprecations
+
 ## v0.5.2 (2023-01-30)
 
 
