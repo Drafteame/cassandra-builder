@@ -3,8 +3,9 @@ package qdelete
 import (
 	"strings"
 
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/scylladb/gocqlx/qb"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // Exec execute delete query and return error on failure
