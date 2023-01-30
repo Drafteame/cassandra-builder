@@ -1,8 +1,9 @@
 package qselect
 
 import (
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/gocql/gocql"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // Query represents a cassandra select statement and his options

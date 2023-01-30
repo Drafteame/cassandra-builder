@@ -1,8 +1,9 @@
 package qinsert
 
 import (
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/gocql/gocql"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // Query represent a Cassandra insert query. Execution should not bind any value

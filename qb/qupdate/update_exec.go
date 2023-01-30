@@ -3,8 +3,9 @@ package qupdate
 import (
 	"strings"
 
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/scylladb/gocqlx/qb"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // Exec run update query from builder and return an error if exists

@@ -4,8 +4,9 @@ import (
 	"errors"
 	"reflect"
 
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/gocql/gocql"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // One return just one result on bind action

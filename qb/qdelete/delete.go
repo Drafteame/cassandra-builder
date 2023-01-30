@@ -1,8 +1,9 @@
 package qdelete
 
 import (
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/gocql/gocql"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // Query represents a Cassandra delete query. Execution should not bind any value

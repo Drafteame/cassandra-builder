@@ -3,14 +3,14 @@ package qb
 import (
 	"time"
 
-	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/gocql/gocql"
 
 	"github.com/Drafteame/cassandra-builder/qb/qcount"
 	delete2 "github.com/Drafteame/cassandra-builder/qb/qdelete"
 	"github.com/Drafteame/cassandra-builder/qb/qinsert"
 	_select "github.com/Drafteame/cassandra-builder/qb/qselect"
+	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/Drafteame/cassandra-builder/qb/qupdate"
-	"github.com/gocql/gocql"
 )
 
 type Consistency uint16

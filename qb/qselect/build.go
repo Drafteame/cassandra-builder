@@ -3,8 +3,9 @@ package qselect
 import (
 	"strings"
 
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/scylladb/gocqlx/qb"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 func (q *Query) build() string {

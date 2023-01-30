@@ -3,9 +3,10 @@ package qcount
 import (
 	"strings"
 
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/qb"
+
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // Exec release count query an return the number of rows and a possible error
