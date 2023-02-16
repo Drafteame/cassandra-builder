@@ -6,9 +6,16 @@ import (
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
+type Client interface {
+	Session() *gocql.Session
+	Debug() bool
+	Restart() error
+	PrintFn() query.DebugPrint
+}
+
 // Query represent a Cassandra update query. Execution should not bind any value
 type Query struct {
-	ctx    query.Query
+	client Client
 	table  string
 	fields query.Columns
 	args   []interface{}
@@ -16,12 +23,8 @@ type Query struct {
 }
 
 // New create a new update query by passing a cassandra session and the affected table
-func New(s *gocql.Session, d bool, dp query.DebugPrint) *Query {
-	return &Query{ctx: query.Query{
-		Session:    s,
-		Debug:      d,
-		PrintQuery: dp,
-	}}
+func New(c Client) *Query {
+	return &Query{client: c}
 }
 
 // Table set the table name to affect with the update query

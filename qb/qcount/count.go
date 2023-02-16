@@ -6,9 +6,18 @@ import (
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
+//go:generate mockery --name=Client --filename=client.go --structname=Client --output=mocks --outpkg=mocks
+
+type Client interface {
+	Session() *gocql.Session
+	Debug() bool
+	Restart() error
+	PrintFn() query.DebugPrint
+}
+
 // Query create new select count query
 type Query struct {
-	ctx            query.Query
+	client         Client
 	table          string
 	column         string
 	where          []query.WhereStm
@@ -17,12 +26,8 @@ type Query struct {
 }
 
 // New create a new count query instance by passing a cassandra session
-func New(s *gocql.Session, d bool, dp query.DebugPrint) *Query {
-	return &Query{ctx: query.Query{
-		Session:    s,
-		Debug:      d,
-		PrintQuery: dp,
-	}}
+func New(c Client) *Query {
+	return &Query{client: c}
 }
 
 // Column set count column of the query

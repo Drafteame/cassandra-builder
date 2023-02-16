@@ -12,7 +12,11 @@ import (
 func (uq *Query) Exec() error {
 	q := uq.build()
 
-	if err := uq.ctx.Session.Query(q, uq.args...).Exec(); err != nil {
+	if err := uq.client.Session().Query(q, uq.args...).Exec(); err != nil {
+		if uq.client.Debug() {
+			uq.client.PrintFn()(q, uq.args, err)
+		}
+
 		return err
 	}
 
@@ -34,8 +38,8 @@ func (uq *Query) build() string {
 
 	queryStr, _ := q.ToCql()
 
-	if uq.ctx.Debug {
-		uq.ctx.PrintQuery(queryStr, uq.args)
+	if uq.client.Debug() {
+		uq.client.PrintFn()(queryStr, uq.args, nil)
 	}
 
 	return strings.TrimSpace(queryStr)

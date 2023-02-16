@@ -1,24 +1,37 @@
-package qinsert
+package runner
 
 import (
-	"strings"
-
+	"github.com/avast/retry-go/v4"
 	"github.com/gocql/gocql"
-	"github.com/scylladb/gocqlx/qb"
 
+	"github.com/Drafteame/cassandra-builder/qb"
 	"github.com/Drafteame/cassandra-builder/qb/errors"
+	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
-// Exec execute insert query with args
-func (iq *Query) Exec() error {
-	q := iq.build()
+type Client interface {
+	Session() *gocql.Session
+	Config() qb.Config
+	Restart() error
+	Debug() bool
+	PrintFn() query.DebugPrint
+}
 
+type Runner struct {
+	client Client
+}
+
+func (r *Runner) Query() {}
+
+func (r *Runner) QueryOne() {}
+
+func (r *Runner) QueryNone(query string, args []interface{}) error {
 	execFn := func() error {
 		if r.client.Session() == nil || r.client.Session().Closed() {
 			return errors.ErrClosedConnection
 		}
 
-		return r.client.Session().Query(q, iq.args...).Exec()
+		return r.client.Session().Query(query, args...).Exec()
 	}
 
 	opts := []retry.Option{
@@ -43,15 +56,6 @@ func (iq *Query) Exec() error {
 	return retry.Do(execFn, opts...)
 }
 
-func (iq *Query) build() string {
-	q := qb.Insert(iq.table)
-	q.Columns(iq.fields...)
-
-	queryStr, _ := q.ToCql()
-
-	if iq.client.Debug() {
-		iq.client.PrintFn()(queryStr, iq.args)
-	}
-
-	return strings.TrimSpace(queryStr)
+func New(c Client) *Runner {
+	return &Runner{client: c}
 }

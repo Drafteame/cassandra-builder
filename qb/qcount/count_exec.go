@@ -15,7 +15,7 @@ func (cq *Query) Exec() (int64, error) {
 
 	var count int64
 
-	if err := cq.ctx.Session.Query(q, cq.args...).Consistency(gocql.One).Scan(&count); err != nil {
+	if err := cq.client.Session().Query(q, cq.args...).Consistency(gocql.One).Scan(&count); err != nil {
 		return 0, err
 	}
 
@@ -35,8 +35,8 @@ func (cq *Query) build() string {
 
 	queryStr, _ := q.ToCql()
 
-	if cq.ctx.Debug {
-		cq.ctx.PrintQuery(queryStr, cq.args)
+	if cq.client.Debug() {
+		cq.client.PrintFn()(queryStr, cq.args)
 	}
 
 	return strings.TrimSpace(queryStr)

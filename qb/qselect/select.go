@@ -6,9 +6,16 @@ import (
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
+type Client interface {
+	Session() *gocql.Session
+	Debug() bool
+	Restart() error
+	PrintFn() query.DebugPrint
+}
+
 // Query represents a cassandra select statement and his options
 type Query struct {
-	ctx            query.Query
+	client         Client
 	fields         query.Columns
 	args           []interface{}
 	table          string
@@ -22,12 +29,8 @@ type Query struct {
 }
 
 // New create a new select query by passing a cassandra session and debug options
-func New(s *gocql.Session, d bool, dp query.DebugPrint) *Query {
-	return &Query{ctx: query.Query{
-		Session:    s,
-		Debug:      d,
-		PrintQuery: dp,
-	}}
+func New(c Client) *Query {
+	return &Query{client: c}
 }
 
 // Fields save query fields that should be used for select query

@@ -15,6 +15,7 @@ func TestNew(t *testing.T) {
 
 	if !reflect.DeepEqual(q.ctx.Session, s) {
 		t.Errorf("associated session is different")
+		return
 	}
 }
 
@@ -24,11 +25,13 @@ func TestQuery_From(t *testing.T) {
 	q.From("test")
 	if q.table != "test" {
 		t.Errorf("exp: test got: %v", q.table)
+		return
 	}
 
 	q.From("test2")
 	if q.table != "test2" {
 		t.Errorf("exp: test2 got: %v", q.table)
+		return
 	}
 }
 

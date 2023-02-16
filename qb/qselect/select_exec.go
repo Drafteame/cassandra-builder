@@ -1,18 +1,18 @@
 package qselect
 
 import (
-	"errors"
 	"reflect"
 
 	"github.com/gocql/gocql"
 
+	"github.com/Drafteame/cassandra-builder/qb/errors"
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 // One return just one result on bind action
 func (q *Query) One() error {
 	if q.bind == nil {
-		return errors.New("nil bind is not allowed, use None() functions instead One()")
+		return errors.ErrNilBinding
 	}
 
 	if err := query.VerifyBind(q.bind, reflect.Struct); err != nil {
@@ -23,7 +23,7 @@ func (q *Query) One() error {
 
 	var jsonRow string
 
-	if err := q.ctx.Session.Query(sq, q.args...).Consistency(gocql.One).Scan(&jsonRow); err != nil {
+	if err := q.client.Session().Query(sq, q.args...).Consistency(gocql.One).Scan(&jsonRow); err != nil {
 		return err
 	}
 
@@ -45,7 +45,7 @@ func (q *Query) One() error {
 // All return all rows on bind action. Bind should be a slice of structs
 func (q *Query) All() error {
 	if q.bind == nil {
-		return errors.New("nil bind is not allowed, use None() function instead All()")
+		return errors.ErrNilBinding
 	}
 
 	if err := query.VerifyBind(q.bind, reflect.Slice); err != nil {
@@ -56,8 +56,7 @@ func (q *Query) All() error {
 
 	var jsonRow string
 
-	iter := q.ctx.Session.Query(sq, q.args...).Iter()
-	defer func() { _ = iter.Close() }()
+	iter := q.client.Session().Query(sq, q.args...).Iter()
 
 	ib := reflect.Indirect(reflect.ValueOf(q.bind))
 
@@ -73,14 +72,14 @@ func (q *Query) All() error {
 		ib.Set(reflect.Append(ib, reflect.Indirect(elem)))
 	}
 
-	return nil
+	return iter.Close()
 }
 
 // None execute a qselect query without returning values
 func (q *Query) None() error {
 	sq := q.build()
 
-	if err := q.ctx.Session.Query(sq, q.args...).Exec(); err != nil {
+	if err := q.client.Session().Query(sq, q.args...).Exec(); err != nil {
 		return err
 	}
 

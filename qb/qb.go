@@ -1,6 +1,7 @@
 package qb
 
 import (
+	"log"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -29,19 +30,20 @@ const (
 
 // Config is the main cassandra configuration needed
 type Config struct {
-	Port                     int           `yaml:"port" json:"port"`
-	KeyspaceName             string        `yaml:"keyspace_name" json:"keyspace_name"`
-	Username                 string        `yaml:"username" json:"username"`
-	Password                 string        `yaml:"password" json:"password"`
-	ContactPoints            []string      `yaml:"contact_points" json:"contact_points"`
-	Debug                    bool          `yaml:"debug" json:"debug"`
-	ProtoVersion             int           `yaml:"proto_version" json:"proto_version"`
-	Consistency              Consistency   `yaml:"consistency" json:"consistency"`
-	CaPath                   string        `yaml:"ca_path" json:"ca_path"`
-	DisableInitialHostLookup bool          `yaml:"disable_initial_host_lookup" json:"disable_initial_host_lookup"`
-	Timeout                  time.Duration `yaml:"timeout" json:"timeout"`
-	ConnectTimeout           time.Duration `yaml:"connect_timeout" json:"connect_timeout"`
+	Port                     int
+	KeyspaceName             string
+	Username                 string
+	Password                 string
+	ContactPoints            []string
+	Debug                    bool
+	ProtoVersion             int
+	Consistency              Consistency
+	CaPath                   string
+	DisableInitialHostLookup bool
+	Timeout                  time.Duration
+	ConnectTimeout           time.Duration
 	PrintQuery               query.DebugPrint
+	NumRetries               uint
 }
 
 // Client is the main cassandra client abstraction to work with the database
@@ -64,6 +66,67 @@ type Client interface {
 	// Session return the plain session object to build some direct query
 	Session() *gocql.Session
 
-	// Close close cassandra connection pool
+	// Debug return an assertion for debugging
+	Debug() bool
+
+	// PrintFn return the configured debug print function.
+	PrintFn() query.DebugPrint
+
+	// Restart should close and start a new connection.
+	Restart() error
+
+	// Config return current client configuration
+	Config() Config
+
+	// Close ends cassandra connection pool
 	Close()
+}
+
+// DefaultDebugPrint defines a default function that prints resultant query and arguments before being executed
+// and when the Debug flag is true
+func DefaultDebugPrint(q string, args []interface{}, err error) {
+	if q != "" {
+		log.Printf("query: %v \nargs: %v\n", q, args)
+	}
+
+	if err != nil {
+		log.Println("err: ", err.Error())
+	}
+}
+
+// NewClient creates a new cassandra client manager from config
+func NewClient(conf Config) (Client, error) {
+	session, err := getSession(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	c := &client{
+		session:    session,
+		config:     conf,
+		canRestart: true,
+		printQuery: DefaultDebugPrint,
+	}
+
+	if conf.PrintQuery != nil {
+		c.printQuery = conf.PrintQuery
+	}
+
+	return c, nil
+}
+
+// NewClientWithSession creates a new cassandra client manager from a given session.
+func NewClientWithSession(session *gocql.Session, conf Config) (Client, error) {
+	c := &client{
+		session:    session,
+		config:     conf,
+		canRestart: false,
+		printQuery: DefaultDebugPrint,
+	}
+
+	if conf.PrintQuery != nil {
+		c.printQuery = conf.PrintQuery
+	}
+
+	return c, nil
 }
