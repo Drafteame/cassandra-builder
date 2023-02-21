@@ -8,4 +8,6 @@ var (
 	ErrNoStructOrSliceBinding  = errors.New("cassandra-builder: bind value should be a struct or slice")
 	ErrNoSliceOfStructsBinding = errors.New("cassandra-builder: bind value should be a slice of structs")
 	ErrClosedConnection        = errors.New("cassandra-builder: can execute on closed connection")
+	ErrNilIterator             = errors.New("cassandra-builder: nil iterator is not allowed")
+	ErrParsing                 = errors.New("cassandra-builder: error parsing row")
 )

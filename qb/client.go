@@ -5,6 +5,8 @@ import (
 
 	"github.com/Drafteame/cassandra-builder/qb/qcount"
 	"github.com/Drafteame/cassandra-builder/qb/qdelete"
+
+	models "github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/qinsert"
 	"github.com/Drafteame/cassandra-builder/qb/qselect"
 	"github.com/Drafteame/cassandra-builder/qb/query"
@@ -13,7 +15,7 @@ import (
 
 type client struct {
 	canRestart bool
-	config     Config
+	config     models.Config
 	session    *gocql.Session
 	printQuery query.DebugPrint
 }
@@ -56,7 +58,8 @@ func (c *client) Session() *gocql.Session {
 	return c.session
 }
 
-func (c *client) Config() Config {
+// TODO: check if affects existent logic
+func (c *client) Config() models.Config {
 	return c.config
 }
 
@@ -73,7 +76,7 @@ func (c *client) Restart() error {
 	return nil
 }
 
-func getSession(c Config) (*gocql.Session, error) {
+func getSession(c models.Config) (*gocql.Session, error) {
 	cluster := gocql.NewCluster(c.ContactPoints...)
 	cluster.Keyspace = c.KeyspaceName
 	cluster.Consistency = gocql.Consistency(c.Consistency)

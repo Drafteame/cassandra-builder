@@ -2,10 +2,10 @@ package qb
 
 import (
 	"log"
-	"time"
 
 	"github.com/gocql/gocql"
 
+	models "github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/qcount"
 	delete2 "github.com/Drafteame/cassandra-builder/qb/qdelete"
 	"github.com/Drafteame/cassandra-builder/qb/qinsert"
@@ -13,38 +13,6 @@ import (
 	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/Drafteame/cassandra-builder/qb/qupdate"
 )
-
-type Consistency uint16
-
-const (
-	Any         Consistency = 0x00
-	One         Consistency = 0x01
-	Two         Consistency = 0x02
-	Three       Consistency = 0x03
-	Quorum      Consistency = 0x04
-	All         Consistency = 0x05
-	LocalQuorum Consistency = 0x06
-	EachQuorum  Consistency = 0x07
-	LocalOne    Consistency = 0x0A
-)
-
-// Config is the main cassandra configuration needed
-type Config struct {
-	Port                     int
-	KeyspaceName             string
-	Username                 string
-	Password                 string
-	ContactPoints            []string
-	Debug                    bool
-	ProtoVersion             int
-	Consistency              Consistency
-	CaPath                   string
-	DisableInitialHostLookup bool
-	Timeout                  time.Duration
-	ConnectTimeout           time.Duration
-	PrintQuery               query.DebugPrint
-	NumRetries               uint
-}
 
 // Client is the main cassandra client abstraction to work with the database
 type Client interface {
@@ -76,7 +44,7 @@ type Client interface {
 	Restart() error
 
 	// Config return current client configuration
-	Config() Config
+	Config() models.Config
 
 	// Close ends cassandra connection pool
 	Close()
@@ -95,7 +63,7 @@ func DefaultDebugPrint(q string, args []interface{}, err error) {
 }
 
 // NewClient creates a new cassandra client manager from config
-func NewClient(conf Config) (Client, error) {
+func NewClient(conf models.Config) (Client, error) {
 	session, err := getSession(conf)
 	if err != nil {
 		return nil, err
@@ -116,7 +84,7 @@ func NewClient(conf Config) (Client, error) {
 }
 
 // NewClientWithSession creates a new cassandra client manager from a given session.
-func NewClientWithSession(session *gocql.Session, conf Config) (Client, error) {
+func NewClientWithSession(session *gocql.Session, conf models.Config) (Client, error) {
 	c := &client{
 		session:    session,
 		config:     conf,

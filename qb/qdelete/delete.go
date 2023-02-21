@@ -3,13 +3,13 @@ package qdelete
 import (
 	"github.com/gocql/gocql"
 
-	"github.com/Drafteame/cassandra-builder/qb"
+	"github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 type Client interface {
 	Session() *gocql.Session
-	Config() qb.Config
+	Config() models.Config
 	Restart() error
 	Debug() bool
 	PrintFn() query.DebugPrint

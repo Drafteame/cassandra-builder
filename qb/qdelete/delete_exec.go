@@ -6,7 +6,7 @@ import (
 	"github.com/scylladb/gocqlx/qb"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
-	"github.com/Drafteame/cassandra-builder/runner"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // Exec execute delete query and return error on failure
@@ -15,7 +15,11 @@ func (dq *Query) Exec() error {
 
 	q := dq.build()
 
-	if err := dq.client.Session().Query(q, dq.args...).Exec(); err != nil {
+	if err := run.QueryNone(q, dq.args); err != nil {
+		if dq.client.Debug() {
+			dq.client.PrintFn()(q, dq.args, err)
+		}
+
 		return err
 	}
 
@@ -32,7 +36,7 @@ func (dq *Query) build() string {
 	queryStr, _ := q.ToCql()
 
 	if dq.client.Debug() {
-		dq.client.PrintFn()(queryStr, dq.args)
+		dq.client.PrintFn()(queryStr, dq.args, nil)
 	}
 
 	return strings.TrimSpace(queryStr)

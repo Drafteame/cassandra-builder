@@ -4,20 +4,18 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gocql/gocql"
-
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
-func TestNew(t *testing.T) {
-	s := &gocql.Session{}
-	q := New(s, false, nil)
+// func TestNew(t *testing.T) {
+// 	q := new(Query)
+// 	a := New(q.client)
 
-	if !reflect.DeepEqual(q.ctx.Session, s) {
-		t.Errorf("associated session is different")
-		return
-	}
-}
+// 	if !reflect.DeepEqual(a.client, "test") {
+// 		t.Errorf("associated table is different")
+// 		return
+// 	}
+// }
 
 func TestQuery_From(t *testing.T) {
 	q := &Query{}

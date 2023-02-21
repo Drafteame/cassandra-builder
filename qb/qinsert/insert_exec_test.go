@@ -30,7 +30,7 @@ func TestInsertQuery_build(t *testing.T) {
 	}
 
 	for _, test := range tt {
-		q := New(nil, false, nil).Fields(test.fields...).Into(test.table).Values(test.values...)
+		q := New(nil).Fields(test.fields...).Into(test.table).Values(test.values...)
 		query := q.build()
 
 		if query != test.res {

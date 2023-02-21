@@ -74,7 +74,7 @@ func TestQuery_build(t *testing.T) {
 	}
 
 	for _, test := range tt {
-		q := New(nil, false, nil).Table(test.table)
+		q := New(nil).Table(test.table)
 
 		for _, s := range test.set {
 			q = q.Set(s.field, s.value)

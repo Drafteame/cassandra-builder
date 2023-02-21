@@ -6,13 +6,15 @@ import (
 	"github.com/scylladb/gocqlx/qb"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // Exec run update query from builder and return an error if exists
 func (uq *Query) Exec() error {
+	run := runner.New(uq.client)
 	q := uq.build()
 
-	if err := uq.client.Session().Query(q, uq.args...).Exec(); err != nil {
+	if err := run.QueryNone(q, uq.args); err != nil {
 		if uq.client.Debug() {
 			uq.client.PrintFn()(q, uq.args, err)
 		}

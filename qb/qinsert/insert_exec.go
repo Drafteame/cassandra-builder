@@ -3,44 +3,24 @@ package qinsert
 import (
 	"strings"
 
-	"github.com/gocql/gocql"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 	"github.com/scylladb/gocqlx/qb"
-
-	"github.com/Drafteame/cassandra-builder/qb/errors"
 )
 
 // Exec execute insert query with args
 func (iq *Query) Exec() error {
+	run := runner.New(iq.client)
 	q := iq.build()
 
-	execFn := func() error {
-		if r.client.Session() == nil || r.client.Session().Closed() {
-			return errors.ErrClosedConnection
+	if err := run.QueryNone(q, iq.args); err != nil {
+		if iq.client.Debug() {
+			iq.client.PrintFn()(q, iq.args, err)
 		}
 
-		return r.client.Session().Query(q, iq.args...).Exec()
+		return err
 	}
 
-	opts := []retry.Option{
-		retry.Attempts(r.client.Config().NumRetries),
-		retry.RetryIf(func(err error) bool {
-			switch err {
-			case gocql.ErrNoConnections, errors.ErrClosedConnection:
-				return true
-			default:
-				return false
-			}
-		}),
-		retry.OnRetry(func(n uint, err error) {
-			errRestart := r.client.Restart()
-
-			if r.client.Debug() {
-				r.client.PrintFn()("", nil, errRestart)
-			}
-		}),
-	}
-
-	return retry.Do(execFn, opts...)
+	return nil
 }
 
 func (iq *Query) build() string {
@@ -50,7 +30,7 @@ func (iq *Query) build() string {
 	queryStr, _ := q.ToCql()
 
 	if iq.client.Debug() {
-		iq.client.PrintFn()(queryStr, iq.args)
+		iq.client.PrintFn()(queryStr, iq.args, nil)
 	}
 
 	return strings.TrimSpace(queryStr)

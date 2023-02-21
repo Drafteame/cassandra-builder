@@ -4,8 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gocql/gocql"
-
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
@@ -76,7 +74,7 @@ func TestQuery_build(t *testing.T) {
 	}
 
 	for i, test := range tt {
-		q := New(&gocql.Session{}, false, nil).From(test.table).Column(test.column)
+		q := New(nil).From(test.table).Column(test.column)
 
 		for _, w := range test.where {
 			q = q.Where(w.Field, w.Op, w.Value)

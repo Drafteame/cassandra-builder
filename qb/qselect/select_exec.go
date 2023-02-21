@@ -3,10 +3,9 @@ package qselect
 import (
 	"reflect"
 
-	"github.com/gocql/gocql"
-
 	"github.com/Drafteame/cassandra-builder/qb/errors"
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // One return just one result on bind action
@@ -21,10 +20,16 @@ func (q *Query) One() error {
 
 	sq := q.build()
 
-	var jsonRow string
+	run := runner.New(q.client)
 
-	if err := q.client.Session().Query(sq, q.args...).Consistency(gocql.One).Scan(&jsonRow); err != nil {
+	out, err := run.QueryOne(sq, q.args)
+	if err != nil {
 		return err
+	}
+
+	jsonRow, ok := out.(string)
+	if !ok {
+		return errors.ErrParsing
 	}
 
 	ib := reflect.Indirect(reflect.ValueOf(q.bind))
@@ -44,6 +49,7 @@ func (q *Query) One() error {
 
 // All return all rows on bind action. Bind should be a slice of structs
 func (q *Query) All() error {
+	run := runner.New(q.client)
 	if q.bind == nil {
 		return errors.ErrNilBinding
 	}
@@ -54,34 +60,5 @@ func (q *Query) All() error {
 
 	sq := q.build()
 
-	var jsonRow string
-
-	iter := q.client.Session().Query(sq, q.args...).Iter()
-
-	ib := reflect.Indirect(reflect.ValueOf(q.bind))
-
-	bv := reflect.ValueOf(ib.Interface())
-	bt := bv.Type().Elem()
-
-	for iter.Scan(&jsonRow) {
-		elem, err := query.BindRow([]byte(jsonRow), bt)
-		if err != nil {
-			return err
-		}
-
-		ib.Set(reflect.Append(ib, reflect.Indirect(elem)))
-	}
-
-	return iter.Close()
-}
-
-// None execute a qselect query without returning values
-func (q *Query) None() error {
-	sq := q.build()
-
-	if err := q.client.Session().Query(sq, q.args...).Exec(); err != nil {
-		return err
-	}
-
-	return nil
+	return run.Query(sq, q.args, q.bind)
 }

@@ -3,11 +3,13 @@ package qinsert
 import (
 	"github.com/gocql/gocql"
 
+	"github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 type Client interface {
 	Session() *gocql.Session
+	Config() models.Config
 	Debug() bool
 	Restart() error
 	PrintFn() query.DebugPrint
