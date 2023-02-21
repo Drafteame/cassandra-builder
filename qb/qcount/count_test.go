@@ -5,17 +5,17 @@ import (
 	"testing"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner/mocks"
+	"github.com/stretchr/testify/assert"
 )
 
-// func TestNew(t *testing.T) {
-// 	q := new(Query)
-// 	a := New(q.client)
+func TestNew(t *testing.T) {
+	client := mocks.NewClient(t)
+	queue := New(client)
 
-// 	if !reflect.DeepEqual(a.client, "test") {
-// 		t.Errorf("associated table is different")
-// 		return
-// 	}
-// }
+	assert.Equal(t, client, queue.client)
+
+}
 
 func TestQuery_From(t *testing.T) {
 	q := &Query{}

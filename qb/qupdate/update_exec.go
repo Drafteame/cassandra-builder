@@ -12,7 +12,7 @@ import (
 // Exec run update query from builder and return an error if exists
 func (uq *Query) Exec() error {
 	run := runner.New(uq.client)
-	q := uq.build()
+	q := uq.Build()
 
 	if err := run.QueryNone(q, uq.args); err != nil {
 		if uq.client.Debug() {
@@ -25,7 +25,7 @@ func (uq *Query) Exec() error {
 	return nil
 }
 
-func (uq *Query) build() string {
+func (uq *Query) Build() string {
 	q := qb.Update(uq.table)
 
 	if len(uq.fields) > 0 {

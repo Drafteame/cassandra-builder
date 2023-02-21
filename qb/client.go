@@ -58,7 +58,6 @@ func (c *client) Session() *gocql.Session {
 	return c.session
 }
 
-// TODO: check if affects existent logic
 func (c *client) Config() models.Config {
 	return c.config
 }

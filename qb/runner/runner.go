@@ -11,6 +11,8 @@ import (
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
+//go:generate mockery --name=Client --filename=client.go --structname=Client --output=mocks --outpkg=mocks
+
 type Client interface {
 	Session() *gocql.Session
 	Config() models.Config
