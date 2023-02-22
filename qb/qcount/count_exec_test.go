@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
-	mocks "github.com/Drafteame/cassandra-builder/qb/runner/mocks"
+	"github.com/Drafteame/cassandra-builder/qb/test/mocks"
 )
 
 func TestQuery_build(t *testing.T) {
@@ -76,8 +76,6 @@ func TestQuery_build(t *testing.T) {
 
 	for i, test := range tt {
 		client := mocks.NewClient(t)
-
-		client.On("Debug").Return(false)
 
 		q := New(client).From(test.table).Column(test.column)
 

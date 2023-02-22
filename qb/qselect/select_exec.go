@@ -22,14 +22,9 @@ func (q *Query) One() error {
 
 	run := runner.New(q.client)
 
-	out, err := run.QueryOne(sq, q.args)
+	jsonRow, err := run.QueryOne(sq, q.args)
 	if err != nil {
 		return err
-	}
-
-	jsonRow, ok := out.(string)
-	if !ok {
-		return errors.ErrParsing
 	}
 
 	ib := reflect.Indirect(reflect.ValueOf(q.bind))

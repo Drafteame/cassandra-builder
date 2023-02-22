@@ -1,30 +1,20 @@
 package qdelete
 
 import (
-	"github.com/gocql/gocql"
-
-	"github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
-
-type Client interface {
-	Session() *gocql.Session
-	Config() models.Config
-	Restart() error
-	Debug() bool
-	PrintFn() query.DebugPrint
-}
 
 // Query represents a Cassandra delete query. Execution should not bind any value
 type Query struct {
-	client Client
+	client runner.Client
 	table  string
 	where  []query.WhereStm
 	args   []interface{}
 }
 
 // New create a new delete query instance by passing a cassandra session
-func New(c Client) *Query {
+func New(c runner.Client) *Query {
 	return &Query{client: c}
 }
 
