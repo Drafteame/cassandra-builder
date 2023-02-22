@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
 type Consistency uint16
@@ -34,6 +32,5 @@ type Config struct {
 	DisableInitialHostLookup bool
 	Timeout                  time.Duration
 	ConnectTimeout           time.Duration
-	PrintQuery               query.DebugPrint
 	NumRetries               uint
 }

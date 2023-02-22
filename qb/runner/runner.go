@@ -11,14 +11,13 @@ import (
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
 
-//go:generate mockery --name=Client --filename=client.go --structname=Client --output=mocks --outpkg=mocks
+//go:generate mockery --name=Client --filename=client.go --structname=Client --output=../test/mocks --outpkg=mocks
 
 type Client interface {
 	Session() *gocql.Session
 	Config() models.Config
 	Restart() error
 	Debug() bool
-	PrintFn() query.DebugPrint
 }
 
 type Runner struct {
@@ -43,15 +42,51 @@ func (r *Runner) Query(stmt string, args []interface{}, bind interface{}) error 
 	return nil
 }
 
-func (r *Runner) QueryOne(query string, args []interface{}) (interface{}, error) {
-	var out interface{}
+func (r *Runner) QueryCount(query string, args []interface{}) (int64, error) {
+	var count int64
 
 	execFn := func() error {
 		if r.client.Session() == nil || r.client.Session().Closed() {
 			return errors.ErrClosedConnection
 		}
 
-		return r.client.Session().Query(query, args...).Consistency(gocql.One).Scan(&out)
+		if err := r.client.Session().Query(query, args...).Consistency(gocql.One).Scan(&count); err != nil {
+			if err == gocql.ErrNoConnections {
+				return err
+			}
+
+			return retry.Unrecoverable(err)
+		}
+
+		return nil
+	}
+
+	opts := r.getRetryOptions()
+
+	if err := retry.Do(execFn, opts...); err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (r *Runner) QueryOne(query string, args []interface{}) (string, error) {
+	var jsonRow string
+
+	execFn := func() error {
+		if r.client.Session() == nil || r.client.Session().Closed() {
+			return errors.ErrClosedConnection
+		}
+
+		if err := r.client.Session().Query(query, args...).Consistency(gocql.One).Scan(&jsonRow); err != nil {
+			if err == gocql.ErrNoConnections {
+				return err
+			}
+
+			return retry.Unrecoverable(err)
+		}
+
+		return nil
 	}
 
 	opts := r.getRetryOptions()
@@ -60,7 +95,7 @@ func (r *Runner) QueryOne(query string, args []interface{}) (interface{}, error)
 		return "", err
 	}
 
-	return out, nil
+	return jsonRow, nil
 }
 
 func (r *Runner) QueryNone(query string, args []interface{}) error {
@@ -69,7 +104,15 @@ func (r *Runner) QueryNone(query string, args []interface{}) error {
 			return errors.ErrClosedConnection
 		}
 
-		return r.client.Session().Query(query, args...).Exec()
+		if err := r.client.Session().Query(query, args...).Exec(); err != nil {
+			if err == gocql.ErrNoConnections {
+				return err
+			}
+
+			return retry.Unrecoverable(err)
+		}
+
+		return nil
 	}
 
 	opts := r.getRetryOptions()
@@ -84,20 +127,11 @@ func New(c Client) *Runner {
 func (r *Runner) getRetryOptions() []retry.Option {
 	return []retry.Option{
 		retry.Attempts(r.client.Config().NumRetries),
-		retry.RetryIf(func(err error) bool {
-			switch err {
-			case gocql.ErrNoConnections, errors.ErrClosedConnection:
-				return true
-			default:
-				return false
-			}
-		}),
 		retry.OnRetry(func(n uint, err error) {
-			errRestart := r.client.Restart()
 
-			if r.client.Debug() {
-				r.client.PrintFn()("", nil, errRestart)
-			}
+			_ = r.client.Restart()
+
+			//TODO: handle error
 		}),
 	}
 }
@@ -124,5 +158,13 @@ func (r *Runner) queryAll(stmt string, args []interface{}, bind interface{}) err
 		ib.Set(reflect.Append(ib, reflect.Indirect(elem)))
 	}
 
-	return iter.Close()
+	if err := iter.Close(); err != nil {
+		if err == gocql.ErrNoConnections {
+			return err
+		}
+
+		return retry.Unrecoverable(err)
+	}
+
+	return nil
 }

@@ -1,23 +1,13 @@
 package qupdate
 
 import (
-	"github.com/gocql/gocql"
-
-	"github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
-
-type Client interface {
-	Session() *gocql.Session
-	Config() models.Config
-	Debug() bool
-	Restart() error
-	PrintFn() query.DebugPrint
-}
 
 // Query represent a Cassandra update query. Execution should not bind any value
 type Query struct {
-	client Client
+	client runner.Client
 	table  string
 	fields query.Columns
 	args   []interface{}
@@ -25,7 +15,7 @@ type Query struct {
 }
 
 // New create a new update query by passing a cassandra session and the affected table
-func New(c Client) *Query {
+func New(c runner.Client) *Query {
 	return &Query{client: c}
 }
 

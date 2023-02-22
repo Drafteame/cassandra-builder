@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Drafteame/cassandra-builder/qb/runner/mocks"
+	"github.com/Drafteame/cassandra-builder/qb/test/mocks"
 )
 
 func TestInsertQuery_build(t *testing.T) {
@@ -33,8 +33,6 @@ func TestInsertQuery_build(t *testing.T) {
 
 	for _, test := range tt {
 		client := mocks.NewClient(t)
-
-		client.On("Debug").Return(false)
 
 		q := New(client).Fields(test.fields...).Into(test.table).Values(test.values...)
 		query := q.Build()

@@ -6,8 +6,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/gocql/gocql"
-
 	"github.com/Drafteame/cassandra-builder/qb/errors"
 )
 
@@ -20,13 +18,6 @@ type (
 
 	// DebugPrint defines a callback that prints query values
 	DebugPrint func(q string, args []interface{}, err error)
-
-	// Query Base definition of query
-	Query struct {
-		Session    *gocql.Session
-		Debug      bool
-		PrintQuery DebugPrint
-	}
 )
 
 const (

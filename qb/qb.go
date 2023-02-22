@@ -1,8 +1,6 @@
 package qb
 
 import (
-	"log"
-
 	"github.com/gocql/gocql"
 
 	models "github.com/Drafteame/cassandra-builder/qb/models"
@@ -10,7 +8,6 @@ import (
 	delete2 "github.com/Drafteame/cassandra-builder/qb/qdelete"
 	"github.com/Drafteame/cassandra-builder/qb/qinsert"
 	_select "github.com/Drafteame/cassandra-builder/qb/qselect"
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/Drafteame/cassandra-builder/qb/qupdate"
 )
 
@@ -37,9 +34,6 @@ type Client interface {
 	// Debug return an assertion for debugging
 	Debug() bool
 
-	// PrintFn return the configured debug print function.
-	PrintFn() query.DebugPrint
-
 	// Restart should close and start a new connection.
 	Restart() error
 
@@ -48,53 +42,4 @@ type Client interface {
 
 	// Close ends cassandra connection pool
 	Close()
-}
-
-// DefaultDebugPrint defines a default function that prints resultant query and arguments before being executed
-// and when the Debug flag is true
-func DefaultDebugPrint(q string, args []interface{}, err error) {
-	if q != "" {
-		log.Printf("query: %v \nargs: %v\n", q, args)
-	}
-
-	if err != nil {
-		log.Println("err: ", err.Error())
-	}
-}
-
-// NewClient creates a new cassandra client manager from config
-func NewClient(conf models.Config) (Client, error) {
-	session, err := getSession(conf)
-	if err != nil {
-		return nil, err
-	}
-
-	c := &client{
-		session:    session,
-		config:     conf,
-		canRestart: true,
-		printQuery: DefaultDebugPrint,
-	}
-
-	if conf.PrintQuery != nil {
-		c.printQuery = conf.PrintQuery
-	}
-
-	return c, nil
-}
-
-// NewClientWithSession creates a new cassandra client manager from a given session.
-func NewClientWithSession(session *gocql.Session, conf models.Config) (Client, error) {
-	c := &client{
-		session:    session,
-		config:     conf,
-		canRestart: false,
-		printQuery: DefaultDebugPrint,
-	}
-
-	if conf.PrintQuery != nil {
-		c.printQuery = conf.PrintQuery
-	}
-
-	return c, nil
 }

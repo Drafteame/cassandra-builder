@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
-	"github.com/Drafteame/cassandra-builder/qb/runner/mocks"
+	"github.com/Drafteame/cassandra-builder/qb/test/mocks"
+
 	"github.com/stretchr/testify/assert"
 )
 

@@ -15,10 +15,6 @@ func (uq *Query) Exec() error {
 	q := uq.Build()
 
 	if err := run.QueryNone(q, uq.args); err != nil {
-		if uq.client.Debug() {
-			uq.client.PrintFn()(q, uq.args, err)
-		}
-
 		return err
 	}
 
@@ -39,10 +35,6 @@ func (uq *Query) Build() string {
 	}
 
 	queryStr, _ := q.ToCql()
-
-	if uq.client.Debug() {
-		uq.client.PrintFn()(queryStr, uq.args, nil)
-	}
 
 	return strings.TrimSpace(queryStr)
 }

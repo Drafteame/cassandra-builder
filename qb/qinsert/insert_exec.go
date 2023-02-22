@@ -13,10 +13,6 @@ func (iq *Query) Exec() error {
 	q := iq.Build()
 
 	if err := run.QueryNone(q, iq.args); err != nil {
-		if iq.client.Debug() {
-			iq.client.PrintFn()(q, iq.args, err)
-		}
-
 		return err
 	}
 
@@ -28,10 +24,6 @@ func (iq *Query) Build() string {
 	q.Columns(iq.fields...)
 
 	queryStr, _ := q.ToCql()
-
-	if iq.client.Debug() {
-		iq.client.PrintFn()(queryStr, iq.args, nil)
-	}
 
 	return strings.TrimSpace(queryStr)
 }
