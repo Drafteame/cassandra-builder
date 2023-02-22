@@ -9,7 +9,6 @@ import (
 	models "github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/qinsert"
 	"github.com/Drafteame/cassandra-builder/qb/qselect"
-	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/Drafteame/cassandra-builder/qb/qupdate"
 )
 
@@ -17,7 +16,6 @@ type client struct {
 	canRestart bool
 	config     models.Config
 	session    *gocql.Session
-	printQuery query.DebugPrint
 }
 
 var _ Client = &client{}
@@ -46,10 +44,6 @@ func (c *client) Debug() bool {
 	return c.config.Debug
 }
 
-func (c *client) PrintFn() query.DebugPrint {
-	return c.printQuery
-}
-
 func (c *client) Close() {
 	c.session.Close()
 }
@@ -65,7 +59,7 @@ func (c *client) Config() models.Config {
 func (c *client) Restart() error {
 	c.Close()
 
-	session, err := getSession(c.config)
+	session, err := createSession(c.config)
 	if err != nil {
 		return err
 	}
@@ -75,7 +69,7 @@ func (c *client) Restart() error {
 	return nil
 }
 
-func getSession(c models.Config) (*gocql.Session, error) {
+func createSession(c models.Config) (*gocql.Session, error) {
 	cluster := gocql.NewCluster(c.ContactPoints...)
 	cluster.Keyspace = c.KeyspaceName
 	cluster.Consistency = gocql.Consistency(c.Consistency)
@@ -111,4 +105,27 @@ func getSession(c models.Config) (*gocql.Session, error) {
 	}
 
 	return cluster.CreateSession()
+}
+
+// NewClient creates a new cassandra client manager from config
+func NewClient(conf models.Config) (Client, error) {
+	session, err := createSession(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	return &client{
+		session:    session,
+		config:     conf,
+		canRestart: true,
+	}, nil
+}
+
+// NewClientWithSession creates a new cassandra client manager from a given session.
+func NewClientWithSession(session *gocql.Session, conf models.Config) Client {
+	return &client{
+		session:    session,
+		config:     conf,
+		canRestart: false,
+	}
 }

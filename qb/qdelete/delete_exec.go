@@ -16,10 +16,6 @@ func (dq *Query) Exec() error {
 	q := dq.build()
 
 	if err := run.QueryNone(q, dq.args); err != nil {
-		if dq.client.Debug() {
-			dq.client.PrintFn()(q, dq.args, err)
-		}
-
 		return err
 	}
 
@@ -34,10 +30,6 @@ func (dq *Query) build() string {
 	}
 
 	queryStr, _ := q.ToCql()
-
-	if dq.client.Debug() {
-		dq.client.PrintFn()(queryStr, dq.args, nil)
-	}
 
 	return strings.TrimSpace(queryStr)
 }
