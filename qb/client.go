@@ -61,7 +61,7 @@ func (c *client) Config() models.Config {
 func (c *client) Restart() error {
 	c.Close()
 
-	session, err := getSession(c.config)
+	session, err := createSession(c.config)
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func (c *client) Restart() error {
 	return nil
 }
 
-func getSession(c models.Config) (*gocql.Session, error) {
+func createSession(c models.Config) (*gocql.Session, error) {
 	cluster := gocql.NewCluster(c.ContactPoints...)
 	cluster.Keyspace = c.KeyspaceName
 	cluster.Consistency = gocql.Consistency(c.Consistency)
@@ -123,27 +123,23 @@ func DefaultDebugPrint(q string, args []interface{}, err error) {
 
 // NewClient creates a new cassandra client manager from config
 func NewClient(conf models.Config) (Client, error) {
-	session, err := getSession(conf)
+	session, err := createSession(conf)
 	if err != nil {
 		return nil, err
 	}
 
-	c := &client{
+	return &client{
 		session:    session,
 		config:     conf,
 		canRestart: true,
-	}
-
-	return c, nil
+	}, nil
 }
 
 // NewClientWithSession creates a new cassandra client manager from a given session.
 func NewClientWithSession(session *gocql.Session, conf models.Config) (Client, error) {
-	c := &client{
+	return &client{
 		session:    session,
 		config:     conf,
 		canRestart: false,
-	}
-
-	return c, nil
+	}, nil
 }

@@ -68,7 +68,9 @@ func (r *Runner) QueryCount(query string, args []interface{}) (int64, error) {
 			return errors.ErrClosedConnection
 		}
 
-		if err := r.client.Session().Query(query, args...).Consistency(gocql.One).Scan(&count); err != nil {
+		consistency := r.client.Config().Consistency
+
+		if err := r.client.Session().Query(query, args...).Consistency(gocql.Consistency(consistency)).Scan(&count); err != nil {
 			if err == gocql.ErrNoConnections {
 				return err
 			}
@@ -96,7 +98,9 @@ func (r *Runner) QueryOne(query string, args []interface{}) (string, error) {
 			return errors.ErrClosedConnection
 		}
 
-		if err := r.client.Session().Query(query, args...).Consistency(gocql.One).Scan(&jsonRow); err != nil {
+		consistency := r.client.Config().Consistency
+
+		if err := r.client.Session().Query(query, args...).Consistency(gocql.Consistency(consistency)).Scan(&jsonRow); err != nil {
 			if err == gocql.ErrNoConnections {
 				return err
 			}
