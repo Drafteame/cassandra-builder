@@ -59,19 +59,19 @@ func (q *Query) All() error {
 	return run.Query(sq, q.args, q.bind)
 }
 
-func (q *Query) Paginated(pageSize int) (scanner.Scanner, error) {
+func (q *Query) Paginated(pageSize int) (*scanner.Scanner, error) {
 	run := runner.New(q.client)
 	if q.bind == nil {
-		return scanner.Scanner{}, errors.ErrNilBinding
+		return &scanner.Scanner{}, errors.ErrNilBinding
 	}
 
 	if err := query.VerifyBind(q.bind, reflect.Slice); err != nil {
-		return scanner.Scanner{}, err
+		return &scanner.Scanner{}, err
 	}
 
 	sq := q.build()
 
 	scanner := scanner.New(sq, q.args, q.bind, pageSize, run)
 
-	return *scanner, nil
+	return scanner, nil
 }

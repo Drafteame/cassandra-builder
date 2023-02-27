@@ -28,10 +28,10 @@ func (s Scanner) HasNextPage() bool {
 	return s.pageState != nil && len(s.pageState) != 0
 }
 
-func (s *Scanner) NextPage(bind interface{}) error {
+func (s *Scanner) NextPage() error {
 	iter := s.runner.NewQuery(s.stmt, s.args).PageSize(s.pageSize).PageState(s.pageState).Iter()
 
-	if err := s.runner.QueryWithPagination(iter, bind); err != nil {
+	if err := s.runner.QueryWithPagination(iter, s.bind); err != nil {
 		return err
 	}
 
