@@ -42,6 +42,24 @@ func (r *Runner) Query(stmt string, args []interface{}, bind interface{}) error 
 	return nil
 }
 
+func (r *Runner) QueryWithPagination(iter *gocql.Iter, bind interface{}) error {
+	execFn := func() error {
+		if r.client.Session() == nil || r.client.Session().Closed() {
+			return errors.ErrClosedConnection
+		}
+
+		return r.queryWithPagination(iter, bind)
+	}
+
+	opts := r.getRetryOptions()
+
+	if err := retry.Do(execFn, opts...); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *Runner) QueryCount(query string, args []interface{}) (int64, error) {
 	var count int64
 
@@ -124,6 +142,10 @@ func New(c Client) *Runner {
 	return &Runner{client: c}
 }
 
+func (r Runner) NewQuery(stmt string, args []interface{}) *gocql.Query {
+	return r.client.Session().Query(stmt, args...)
+}
+
 func (r *Runner) getRetryOptions() []retry.Option {
 	return []retry.Option{
 		retry.Attempts(r.client.Config().NumRetries),
@@ -143,6 +165,34 @@ func (r *Runner) queryAll(stmt string, args []interface{}, bind interface{}) err
 	if iter == nil {
 		return errors.ErrNilIterator
 	}
+
+	ib := reflect.Indirect(reflect.ValueOf(bind))
+
+	bv := reflect.ValueOf(ib.Interface())
+	bt := bv.Type().Elem()
+
+	for iter.Scan(&jsonRow) {
+		elem, err := query.BindRow([]byte(jsonRow), bt)
+		if err != nil {
+			return err
+		}
+
+		ib.Set(reflect.Append(ib, reflect.Indirect(elem)))
+	}
+
+	if err := iter.Close(); err != nil {
+		if err == gocql.ErrNoConnections {
+			return err
+		}
+
+		return retry.Unrecoverable(err)
+	}
+
+	return nil
+}
+
+func (r *Runner) queryWithPagination(iter *gocql.Iter, bind interface{}) error {
+	var jsonRow string
 
 	ib := reflect.Indirect(reflect.ValueOf(bind))
 
