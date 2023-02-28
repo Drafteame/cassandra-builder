@@ -1,26 +1,27 @@
 package scanner
 
 import (
+	"reflect"
+
+	"github.com/Drafteame/cassandra-builder/qb/errors"
+	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/Drafteame/cassandra-builder/qb/runner"
+	"github.com/gocql/gocql"
 )
 
 type Scanner struct {
-	stmt      string
-	args      []interface{}
+	query     *gocql.Query
 	bind      interface{}
 	pageSize  int
 	pageState []byte
 	runner    *runner.Runner
 }
 
-func New(stmt string, args []interface{}, bind interface{}, pageSize int, runner *runner.Runner) *Scanner {
+func New(query *gocql.Query, pageSize int, runner *runner.Runner) *Scanner {
 	return &Scanner{
-		stmt:      stmt,
-		args:      args,
-		bind:      bind,
-		pageSize:  pageSize,
-		pageState: nil,
-		runner:    runner,
+		query:    query,
+		pageSize: pageSize,
+		runner:   runner,
 	}
 }
 
@@ -29,7 +30,15 @@ func (s Scanner) HasNextPage() bool {
 }
 
 func (s *Scanner) NextPage() error {
-	iter := s.runner.NewQuery(s.stmt, s.args).PageSize(s.pageSize).PageState(s.pageState).Iter()
+	if s.bind == nil {
+		return errors.ErrNilBinding
+	}
+
+	if err := query.VerifyBind(s.bind, reflect.Slice); err != nil {
+		return err
+	}
+
+	iter := s.query.PageSize(s.pageSize).PageState(s.pageState).Iter()
 
 	if err := s.runner.QueryWithPagination(iter, s.bind); err != nil {
 		return err
