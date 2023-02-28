@@ -35,7 +35,7 @@ func TestInsertQuery_build(t *testing.T) {
 		client := mocks.NewClient(t)
 
 		q := New(client).Fields(test.fields...).Into(test.table).Values(test.values...)
-		query := q.Build()
+		query := q.build()
 
 		if query != test.res {
 			t.Errorf("query err: \nexp: '%v' \ngot: '%v'", test.res, query)

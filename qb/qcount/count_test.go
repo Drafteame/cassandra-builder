@@ -23,14 +23,12 @@ func TestQuery_From(t *testing.T) {
 
 	q.From("test")
 	if q.table != "test" {
-		t.Errorf("exp: test got: %v", q.table)
-		return
+		t.Fatalf("exp: test got: %v", q.table)
 	}
 
 	q.From("test2")
 	if q.table != "test2" {
-		t.Errorf("exp: test2 got: %v", q.table)
-		return
+		t.Fatalf("exp: test2 got: %v", q.table)
 	}
 }
 
@@ -39,12 +37,12 @@ func TestQuery_Column(t *testing.T) {
 
 	q.Column("field")
 	if q.column != "field" {
-		t.Errorf("exp: field got: %v", q.column)
+		t.Fatalf("exp: field got: %v", q.column)
 	}
 
 	q.Column("field2")
 	if q.column != "field2" {
-		t.Errorf("exp: field2 got: %v", q.column)
+		t.Fatalf("exp: field2 got: %v", q.column)
 	}
 }
 
@@ -103,11 +101,11 @@ func TestQuery_Where(t *testing.T) {
 		q.Where(test.field, test.op, test.value)
 
 		if !reflect.DeepEqual(q.args, test.expArgs) {
-			t.Errorf("exp: %v got: %v", test.expArgs, q.args)
+			t.Fatalf("exp: %v got: %v", test.expArgs, q.args)
 		}
 
 		if !reflect.DeepEqual(q.where, test.expStm) {
-			t.Errorf("exp: %v got: %v", test.expStm, q.where)
+			t.Fatalf("exp: %v got: %v", test.expStm, q.where)
 		}
 	}
 }

@@ -1,8 +1,6 @@
 package qb
 
 import (
-	"log"
-
 	"github.com/gocql/gocql"
 
 	"github.com/Drafteame/cassandra-builder/qb/qcount"
@@ -109,18 +107,6 @@ func createSession(c models.Config) (*gocql.Session, error) {
 	return cluster.CreateSession()
 }
 
-// DefaultDebugPrint defines a default function that prints resultant query and arguments before being executed
-// and when the Debug flag is true
-func DefaultDebugPrint(q string, args []interface{}, err error) {
-	if q != "" {
-		log.Printf("query: %v \nargs: %v\n", q, args)
-	}
-
-	if err != nil {
-		log.Println("err: ", err.Error())
-	}
-}
-
 // NewClient creates a new cassandra client manager from config
 func NewClient(conf models.Config) (Client, error) {
 	session, err := createSession(conf)
@@ -136,10 +122,10 @@ func NewClient(conf models.Config) (Client, error) {
 }
 
 // NewClientWithSession creates a new cassandra client manager from a given session.
-func NewClientWithSession(session *gocql.Session, conf models.Config) (Client, error) {
+func NewClientWithSession(session *gocql.Session, conf models.Config) Client {
 	return &client{
 		session:    session,
 		config:     conf,
 		canRestart: false,
-	}, nil
+	}
 }

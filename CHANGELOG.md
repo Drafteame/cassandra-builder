@@ -1,3 +1,13 @@
+## v0.7.0 (2023-02-28)
+
+
+- Merge pull request #11 from Drafteame/feat/AH/restart-connection-changes
+- feat: restart connection changes
+- feat: remove debug print and unused ctx
+- feat: tests fixes
+- feat: restart connection
+- chore: save draft for restart connection
+
 ## v0.6.0 (2023-01-30)
 
 

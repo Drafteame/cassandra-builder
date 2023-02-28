@@ -10,7 +10,7 @@ import (
 // Exec execute insert query with args
 func (iq *Query) Exec() error {
 	run := runner.New(iq.client)
-	q := iq.Build()
+	q := iq.build()
 
 	if err := run.QueryNone(q, iq.args); err != nil {
 		return err
@@ -19,7 +19,7 @@ func (iq *Query) Exec() error {
 	return nil
 }
 
-func (iq *Query) Build() string {
+func (iq *Query) build() string {
 	q := qb.Insert(iq.table)
 	q.Columns(iq.fields...)
 
