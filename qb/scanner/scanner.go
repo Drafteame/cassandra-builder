@@ -26,7 +26,7 @@ func New(query *gocql.Query, pageSize int, runner *runner.Runner) *Scanner {
 }
 
 func (s Scanner) HasNextPage() bool {
-	return s.pageState != nil && len(s.pageState) != 0
+	return s.pageState == nil || len(s.pageState) != 0
 }
 
 func (s *Scanner) NextPage() error {
