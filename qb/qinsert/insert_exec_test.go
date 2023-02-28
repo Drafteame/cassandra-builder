@@ -3,6 +3,8 @@ package qinsert
 import (
 	"reflect"
 	"testing"
+
+	"github.com/Drafteame/cassandra-builder/qb/test/mocks"
 )
 
 func TestInsertQuery_build(t *testing.T) {
@@ -30,7 +32,9 @@ func TestInsertQuery_build(t *testing.T) {
 	}
 
 	for _, test := range tt {
-		q := New(nil, false, nil).Fields(test.fields...).Into(test.table).Values(test.values...)
+		client := mocks.NewClient(t)
+
+		q := New(client).Fields(test.fields...).Into(test.table).Values(test.values...)
 		query := q.build()
 
 		if query != test.res {

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/test/mocks"
 )
 
 func TestQuery_build(t *testing.T) {
@@ -74,7 +75,9 @@ func TestQuery_build(t *testing.T) {
 	}
 
 	for _, test := range tt {
-		q := New(nil, false, nil).Table(test.table)
+		client := mocks.NewClient(t)
+
+		q := New(client).Table(test.table)
 
 		for _, s := range test.set {
 			q = q.Set(s.field, s.value)
@@ -84,7 +87,7 @@ func TestQuery_build(t *testing.T) {
 			q = q.Where(w.Field, w.Op, w.Value)
 		}
 
-		qs := q.build()
+		qs := q.Build()
 
 		if qs != test.res {
 			t.Errorf("query err: \nexp: '%s' \ngot: '%s'", test.res, qs)

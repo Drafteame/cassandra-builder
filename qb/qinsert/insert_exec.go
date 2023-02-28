@@ -3,14 +3,16 @@ package qinsert
 import (
 	"strings"
 
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 	"github.com/scylladb/gocqlx/qb"
 )
 
 // Exec execute insert query with args
 func (iq *Query) Exec() error {
+	run := runner.New(iq.client)
 	q := iq.build()
 
-	if err := iq.ctx.Session.Query(q, iq.args...).Exec(); err != nil {
+	if err := run.QueryNone(q, iq.args); err != nil {
 		return err
 	}
 
@@ -22,10 +24,6 @@ func (iq *Query) build() string {
 	q.Columns(iq.fields...)
 
 	queryStr, _ := q.ToCql()
-
-	if iq.ctx.Debug {
-		iq.ctx.PrintQuery(queryStr, iq.args)
-	}
 
 	return strings.TrimSpace(queryStr)
 }

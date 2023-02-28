@@ -6,13 +6,16 @@ import (
 	"github.com/scylladb/gocqlx/qb"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // Exec execute delete query and return error on failure
 func (dq *Query) Exec() error {
+	run := runner.New(dq.client)
+
 	q := dq.build()
 
-	if err := dq.ctx.Session.Query(q, dq.args...).Exec(); err != nil {
+	if err := run.QueryNone(q, dq.args); err != nil {
 		return err
 	}
 
@@ -27,10 +30,6 @@ func (dq *Query) build() string {
 	}
 
 	queryStr, _ := q.ToCql()
-
-	if dq.ctx.Debug {
-		dq.ctx.PrintQuery(queryStr, dq.args)
-	}
 
 	return strings.TrimSpace(queryStr)
 }

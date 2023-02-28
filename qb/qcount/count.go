@@ -1,14 +1,13 @@
 package qcount
 
 import (
-	"github.com/gocql/gocql"
-
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // Query create new select count query
 type Query struct {
-	ctx            query.Query
+	client         runner.Client
 	table          string
 	column         string
 	where          []query.WhereStm
@@ -17,12 +16,8 @@ type Query struct {
 }
 
 // New create a new count query instance by passing a cassandra session
-func New(s *gocql.Session, d bool, dp query.DebugPrint) *Query {
-	return &Query{ctx: query.Query{
-		Session:    s,
-		Debug:      d,
-		PrintQuery: dp,
-	}}
+func New(c runner.Client) *Query {
+	return &Query{client: c}
 }
 
 // Column set count column of the query

@@ -1,14 +1,13 @@
 package qselect
 
 import (
-	"github.com/gocql/gocql"
-
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // Query represents a cassandra select statement and his options
 type Query struct {
-	ctx            query.Query
+	client         runner.Client
 	fields         query.Columns
 	args           []interface{}
 	table          string
@@ -22,12 +21,8 @@ type Query struct {
 }
 
 // New create a new select query by passing a cassandra session and debug options
-func New(s *gocql.Session, d bool, dp query.DebugPrint) *Query {
-	return &Query{ctx: query.Query{
-		Session:    s,
-		Debug:      d,
-		PrintQuery: dp,
-	}}
+func New(c runner.Client) *Query {
+	return &Query{client: c}
 }
 
 // Fields save query fields that should be used for select query

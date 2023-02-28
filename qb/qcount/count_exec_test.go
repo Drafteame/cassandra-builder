@@ -4,9 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gocql/gocql"
-
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/test/mocks"
 )
 
 func TestQuery_build(t *testing.T) {
@@ -76,7 +75,9 @@ func TestQuery_build(t *testing.T) {
 	}
 
 	for i, test := range tt {
-		q := New(&gocql.Session{}, false, nil).From(test.table).Column(test.column)
+		client := mocks.NewClient(t)
+
+		q := New(client).From(test.table).Column(test.column)
 
 		for _, w := range test.where {
 			q = q.Where(w.Field, w.Op, w.Value)

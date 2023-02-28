@@ -3,23 +3,19 @@ package qcount
 import (
 	"strings"
 
-	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/qb"
 
 	"github.com/Drafteame/cassandra-builder/qb/query"
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // Exec release count query an return the number of rows and a possible error
 func (cq *Query) Exec() (int64, error) {
+	run := runner.New(cq.client)
+
 	q := cq.build()
 
-	var count int64
-
-	if err := cq.ctx.Session.Query(q, cq.args...).Consistency(gocql.One).Scan(&count); err != nil {
-		return 0, err
-	}
-
-	return count, nil
+	return run.QueryCount(q, cq.args)
 }
 
 func (cq *Query) build() string {
@@ -34,10 +30,6 @@ func (cq *Query) build() string {
 	}
 
 	queryStr, _ := q.ToCql()
-
-	if cq.ctx.Debug {
-		cq.ctx.PrintQuery(queryStr, cq.args)
-	}
 
 	return strings.TrimSpace(queryStr)
 }

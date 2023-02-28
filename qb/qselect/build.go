@@ -48,9 +48,5 @@ func (q *Query) build() string {
 
 	queryStr, _ := sb.Json().ToCql()
 
-	if q.ctx.Debug {
-		q.ctx.PrintQuery(queryStr, q.args)
-	}
-
 	return strings.TrimSpace(queryStr)
 }
