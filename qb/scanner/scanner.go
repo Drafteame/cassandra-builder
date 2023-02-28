@@ -40,3 +40,7 @@ func (s *Scanner) NextPage() error {
 
 	return nil
 }
+
+func (s *Scanner) Bind(bind interface{}) {
+	s.bind = bind
+}
