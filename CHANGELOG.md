@@ -1,3 +1,19 @@
+## v0.8.0 (2023-03-01)
+
+
+- Merge pull request #13 from Drafteame/feat/pagination
+- feat: pagination
+- refactor: queryWithIterator
+- fix: hasNextPage method
+- fix: binding
+- feat: merge main
+- feat: add bind method
+- feat: merge main
+- fix: pointer
+- feat: implement pagination
+- feat: remove debug print and unused ctx
+- feat: remove debug print and unused ctx
+
 ## v0.7.0 (2023-02-28)
 
 
