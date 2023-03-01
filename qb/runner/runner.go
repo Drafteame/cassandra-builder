@@ -48,7 +48,7 @@ func (r *Runner) QueryWithPagination(iter *gocql.Iter, bind interface{}) error {
 			return errors.ErrClosedConnection
 		}
 
-		return r.queryWithPagination(iter, bind)
+		return r.queryWithIterator(iter, bind)
 	}
 
 	opts := r.getRetryOptions()
@@ -163,39 +163,15 @@ func (r *Runner) getRetryOptions() []retry.Option {
 }
 
 func (r *Runner) queryAll(stmt string, args []interface{}, bind interface{}) error {
-	var jsonRow string
-
 	iter := r.client.Session().Query(stmt, args...).Iter()
 	if iter == nil {
 		return errors.ErrNilIterator
 	}
 
-	ib := reflect.Indirect(reflect.ValueOf(bind))
-
-	bv := reflect.ValueOf(ib.Interface())
-	bt := bv.Type().Elem()
-
-	for iter.Scan(&jsonRow) {
-		elem, err := query.BindRow([]byte(jsonRow), bt)
-		if err != nil {
-			return err
-		}
-
-		ib.Set(reflect.Append(ib, reflect.Indirect(elem)))
-	}
-
-	if err := iter.Close(); err != nil {
-		if err == gocql.ErrNoConnections {
-			return err
-		}
-
-		return retry.Unrecoverable(err)
-	}
-
-	return nil
+	return r.queryWithIterator(iter, bind)
 }
 
-func (r *Runner) queryWithPagination(iter *gocql.Iter, bind interface{}) error {
+func (r *Runner) queryWithIterator(iter *gocql.Iter, bind interface{}) error {
 	var jsonRow string
 
 	ib := reflect.Indirect(reflect.ValueOf(bind))
