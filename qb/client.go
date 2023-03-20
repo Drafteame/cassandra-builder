@@ -3,10 +3,9 @@ package qb
 import (
 	"github.com/gocql/gocql"
 
+	models "github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/qcount"
 	"github.com/Drafteame/cassandra-builder/qb/qdelete"
-
-	models "github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/qinsert"
 	"github.com/Drafteame/cassandra-builder/qb/qselect"
 	"github.com/Drafteame/cassandra-builder/qb/qupdate"

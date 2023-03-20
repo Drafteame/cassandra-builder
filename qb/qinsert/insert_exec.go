@@ -3,8 +3,9 @@ package qinsert
 import (
 	"strings"
 
-	"github.com/Drafteame/cassandra-builder/qb/runner"
 	"github.com/scylladb/gocqlx/qb"
+
+	"github.com/Drafteame/cassandra-builder/qb/runner"
 )
 
 // Exec execute insert query with args

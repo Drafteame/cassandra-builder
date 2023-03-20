@@ -3,10 +3,11 @@ package scanner
 import (
 	"reflect"
 
+	"github.com/gocql/gocql"
+
 	"github.com/Drafteame/cassandra-builder/qb/errors"
 	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/Drafteame/cassandra-builder/qb/runner"
-	"github.com/gocql/gocql"
 )
 
 type Scanner struct {

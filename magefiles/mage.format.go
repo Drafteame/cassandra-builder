@@ -9,12 +9,10 @@ import (
 
 // Lint Runs golangci-lint checks over the code.
 func Lint() error {
-	out, err := sh.Output(
-		"golangci-lint",
-		"run", "./...",
-		"--allow-parallel-runners",
-		"--skip-dirs", `(node_modules|magefiles|\.serverless|mod|bin|vendor|\.github|\.git)`,
-	)
+	command := "revive"
+	args := []string{"-config=revive.toml", "-formatter=friendly", "-exclude=magefiles/...", "./..."}
+
+	out, err := sh.Output(command, args...)
 
 	fmt.Println(out)
 	return err
@@ -22,8 +20,12 @@ func Lint() error {
 
 // Format Runs gofmt over the code.
 func Format() error {
-	out, err := sh.Output("goimports-reviser", "-format", "./...")
-	fmt.Println(out)
+	outImp, err := sh.Output("goimports-reviser", "-format", "./...")
+	if err != nil {
+		return err
+	}
 
-	return err
+	fmt.Println(outImp)
+
+	return nil
 }
