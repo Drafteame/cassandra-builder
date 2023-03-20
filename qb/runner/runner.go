@@ -1,12 +1,13 @@
 package runner
 
 import (
+	"errors"
 	"reflect"
 
 	"github.com/avast/retry-go/v4"
 	"github.com/gocql/gocql"
 
-	"github.com/Drafteame/cassandra-builder/qb/errors"
+	qberrors "github.com/Drafteame/cassandra-builder/qb/errors"
 	"github.com/Drafteame/cassandra-builder/qb/models"
 	"github.com/Drafteame/cassandra-builder/qb/query"
 )
@@ -27,7 +28,7 @@ type Runner struct {
 func (r *Runner) Query(stmt string, args []interface{}, bind interface{}) error {
 	execFn := func() error {
 		if r.client.Session() == nil || r.client.Session().Closed() {
-			return errors.ErrClosedConnection
+			return qberrors.ErrClosedConnection
 		}
 
 		return r.queryAll(stmt, args, bind)
@@ -45,7 +46,7 @@ func (r *Runner) Query(stmt string, args []interface{}, bind interface{}) error 
 func (r *Runner) QueryWithPagination(iter *gocql.Iter, bind interface{}) error {
 	execFn := func() error {
 		if r.client.Session() == nil || r.client.Session().Closed() {
-			return errors.ErrClosedConnection
+			return qberrors.ErrClosedConnection
 		}
 
 		return r.queryWithIterator(iter, bind)
@@ -65,7 +66,7 @@ func (r *Runner) QueryCount(query string, args []interface{}) (int64, error) {
 
 	execFn := func() error {
 		if r.client.Session() == nil || r.client.Session().Closed() {
-			return errors.ErrClosedConnection
+			return qberrors.ErrClosedConnection
 		}
 
 		consistency := r.client.Config().Consistency
@@ -95,13 +96,13 @@ func (r *Runner) QueryOne(query string, args []interface{}) (string, error) {
 
 	execFn := func() error {
 		if r.client.Session() == nil || r.client.Session().Closed() {
-			return errors.ErrClosedConnection
+			return qberrors.ErrClosedConnection
 		}
 
 		consistency := r.client.Config().Consistency
 
 		if err := r.client.Session().Query(query, args...).Consistency(gocql.Consistency(consistency)).Scan(&jsonRow); err != nil {
-			if err == gocql.ErrNoConnections {
+			if errors.Is(err, gocql.ErrNoConnections) || errors.Is(err, gocql.ErrConnectionClosed) {
 				return err
 			}
 
@@ -123,7 +124,7 @@ func (r *Runner) QueryOne(query string, args []interface{}) (string, error) {
 func (r *Runner) QueryNone(query string, args []interface{}) error {
 	execFn := func() error {
 		if r.client.Session() == nil || r.client.Session().Closed() {
-			return errors.ErrClosedConnection
+			return qberrors.ErrClosedConnection
 		}
 
 		if err := r.client.Session().Query(query, args...).Exec(); err != nil {
@@ -165,7 +166,7 @@ func (r *Runner) getRetryOptions() []retry.Option {
 func (r *Runner) queryAll(stmt string, args []interface{}, bind interface{}) error {
 	iter := r.client.Session().Query(stmt, args...).Iter()
 	if iter == nil {
-		return errors.ErrNilIterator
+		return qberrors.ErrNilIterator
 	}
 
 	return r.queryWithIterator(iter, bind)
