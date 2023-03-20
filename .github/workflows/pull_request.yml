@@ -7,72 +7,73 @@ on:
 
 jobs:
   test:
-    name: 👍 Test
+    name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3.3.0
 
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.19.x
+          go-version: 1.20.x
 
       - name: Config private packages
         run: git config --global url.https://${{ secrets.ACCESS_TOKEN }}@github.com/Drafteame.insteadOf https://github.com/Drafteame
 
       - name: Checkout
-        uses: actions/checkout@v3
-
-      # Cache go build cache, used to speedup go test
-      - name: Go Build Cache
-        id: cache-go-mod
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+        uses: actions/checkout@v3.3.0
 
       - name: Install dependencies
-        if: steps.cache-go-mod.outputs.cache-hit != 'true'
         run: go mod download
+
+      - name: Set up gotestfmt
+        uses: gotesttools/gotestfmt-action@v2
+        with:
+          token: "${{ secrets.ACCESS_TOKEN }}"
 
       - name: Test
-        uses: magefile/mage-action@v2.3.0
+        run: |
+          set -euo pipefail
+          go test -json -v -race -cover -coverprofile=coverage.out ./... 2>&1 | tee /tmp/gotest.log | gotestfmt
+
+      - name: Convert out to xml
+        run: |
+          go install github.com/axw/gocov/gocov@latest
+          go install github.com/AlekSi/gocov-xml@latest
+          gocov convert coverage.out | gocov-xml > coverage.xml
+
+      - name: Review coverage
+        uses: codecov/codecov-action@v3
         with:
-          version: latest
-          args: test
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
 
   lint:
-    name: 💅 Lint
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.3.0
 
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.19.x
+          go-version: 1.20.x
 
       - name: Config private packages
         run: git config --global url.https://${{ secrets.ACCESS_TOKEN }}@github.com/Drafteame.insteadOf https://github.com/Drafteame
 
-      # Cache go build cache, used to speedup go test
-      - name: Go Build Cache
-        id: cache-go-mod
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-
       - name: Install dependencies
-        if: steps.cache-go-mod.outputs.cache-hit != 'true'
         run: go mod download
 
-      - name: golint
-        uses: reviewdog/action-golangci-lint@v2
+      - name: Run Linter
+        uses: morphy2k/revive-action@v2
         with:
-          golangci_lint_flags: '--disable-all -E golint'
-          level: warning
+          exclude: "magefiles/..."
+          config: revive.toml
 
   commit_lint:
     runs-on: ubuntu-latest
@@ -86,7 +87,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install Commitizen
         run: pip install -U commitizen

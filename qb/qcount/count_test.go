@@ -4,10 +4,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/Drafteame/cassandra-builder/qb/query"
 	"github.com/Drafteame/cassandra-builder/qb/test/mocks"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
