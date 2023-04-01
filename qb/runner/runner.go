@@ -72,7 +72,8 @@ func (r *Runner) QueryCount(query string, args []interface{}) (int64, error) {
 		consistency := r.client.Config().Consistency
 
 		if err := r.client.Session().Query(query, args...).Consistency(gocql.Consistency(consistency)).Scan(&count); err != nil {
-			if err == gocql.ErrNoConnections {
+			retryablelErrors := errors.Join(gocql.ErrNoConnections, gocql.ErrConnectionClosed, gocql.ErrTimeoutNoResponse)
+			if errors.Is(err, retryablelErrors) {
 				return err
 			}
 
@@ -102,7 +103,8 @@ func (r *Runner) QueryOne(query string, args []interface{}) (string, error) {
 		consistency := r.client.Config().Consistency
 
 		if err := r.client.Session().Query(query, args...).Consistency(gocql.Consistency(consistency)).Scan(&jsonRow); err != nil {
-			if errors.Is(err, gocql.ErrNoConnections) || errors.Is(err, gocql.ErrConnectionClosed) {
+			retryablelErrors := errors.Join(gocql.ErrNoConnections, gocql.ErrConnectionClosed, gocql.ErrTimeoutNoResponse)
+			if errors.Is(err, retryablelErrors) {
 				return err
 			}
 
@@ -128,7 +130,8 @@ func (r *Runner) QueryNone(query string, args []interface{}) error {
 		}
 
 		if err := r.client.Session().Query(query, args...).Exec(); err != nil {
-			if err == gocql.ErrNoConnections {
+			retryablelErrors := errors.Join(gocql.ErrNoConnections, gocql.ErrConnectionClosed, gocql.ErrTimeoutNoResponse)
+			if errors.Is(err, retryablelErrors) {
 				return err
 			}
 
