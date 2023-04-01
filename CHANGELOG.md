@@ -1,3 +1,10 @@
+## v0.11.0 (2023-04-01)
+
+
+- Merge pull request #17 from Drafteame/feat/AH/retriable-errors
+- feat: retriable errors
+- feat: retriable errors
+
 ## v0.10.0 (2023-03-20)
 
 
