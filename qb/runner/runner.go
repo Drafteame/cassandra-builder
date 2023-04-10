@@ -2,6 +2,7 @@ package runner
 
 import (
 	"errors"
+	"log"
 	"reflect"
 
 	"github.com/avast/retry-go/v4"
@@ -72,8 +73,7 @@ func (r *Runner) QueryCount(query string, args []interface{}) (int64, error) {
 		consistency := r.client.Config().Consistency
 
 		if err := r.client.Session().Query(query, args...).Consistency(gocql.Consistency(consistency)).Scan(&count); err != nil {
-			retryablelErrors := errors.Join(gocql.ErrNoConnections, gocql.ErrConnectionClosed, gocql.ErrTimeoutNoResponse)
-			if errors.Is(err, retryablelErrors) {
+			if errors.Is(err, gocql.ErrNoConnections) || errors.Is(err, gocql.ErrConnectionClosed) || errors.Is(err, gocql.ErrTimeoutNoResponse) {
 				return err
 			}
 
@@ -103,8 +103,7 @@ func (r *Runner) QueryOne(query string, args []interface{}) (string, error) {
 		consistency := r.client.Config().Consistency
 
 		if err := r.client.Session().Query(query, args...).Consistency(gocql.Consistency(consistency)).Scan(&jsonRow); err != nil {
-			retryablelErrors := errors.Join(gocql.ErrNoConnections, gocql.ErrConnectionClosed, gocql.ErrTimeoutNoResponse)
-			if errors.Is(err, retryablelErrors) {
+			if errors.Is(err, gocql.ErrNoConnections) || errors.Is(err, gocql.ErrConnectionClosed) || errors.Is(err, gocql.ErrTimeoutNoResponse) {
 				return err
 			}
 
@@ -130,8 +129,7 @@ func (r *Runner) QueryNone(query string, args []interface{}) error {
 		}
 
 		if err := r.client.Session().Query(query, args...).Exec(); err != nil {
-			retryablelErrors := errors.Join(gocql.ErrNoConnections, gocql.ErrConnectionClosed, gocql.ErrTimeoutNoResponse)
-			if errors.Is(err, retryablelErrors) {
+			if errors.Is(err, gocql.ErrNoConnections) || errors.Is(err, gocql.ErrConnectionClosed) || errors.Is(err, gocql.ErrTimeoutNoResponse) {
 				return err
 			}
 
@@ -159,7 +157,10 @@ func (r *Runner) getRetryOptions() []retry.Option {
 		retry.Attempts(r.client.Config().NumRetries),
 		retry.OnRetry(func(n uint, err error) {
 
-			_ = r.client.Restart()
+			log.Printf("retrying query: %s", err.Error())
+			if err := r.client.Restart(); err != nil {
+				log.Printf("error restarting client: %s", err.Error())
+			}
 
 			//TODO: handle error
 		}),
@@ -193,7 +194,7 @@ func (r *Runner) queryWithIterator(iter *gocql.Iter, bind interface{}) error {
 	}
 
 	if err := iter.Close(); err != nil {
-		if err == gocql.ErrNoConnections {
+		if errors.Is(err, gocql.ErrNoConnections) || errors.Is(err, gocql.ErrConnectionClosed) || errors.Is(err, gocql.ErrTimeoutNoResponse) {
 			return err
 		}
 
