@@ -1,3 +1,10 @@
+## v0.11.1 (2023-04-10)
+
+
+- Merge pull request #18 from Drafteame/fix/no_connections
+- fix: error handling
+- fix: error handling
+
 ## v0.11.0 (2023-04-01)
 
 
