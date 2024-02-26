@@ -1,13 +1,13 @@
 module github.com/Drafteame/cassandra-builder
 
-go 1.18
+go 1.20
 
 require (
-	github.com/avast/retry-go/v4 v4.3.3
-	github.com/gocql/gocql v1.3.1
-	github.com/magefile/mage v1.14.0
+	github.com/avast/retry-go/v4 v4.5.1
+	github.com/gocql/gocql v1.6.0
+	github.com/magefile/mage v1.15.0
 	github.com/scylladb/gocqlx v1.5.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.4
 )
 
 require (

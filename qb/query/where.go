@@ -1,6 +1,8 @@
 package query
 
-import "github.com/scylladb/gocqlx/qb"
+import (
+	"github.com/scylladb/gocqlx/qb"
+)
 
 // WhereOp represents a where operation type
 type WhereOp string
@@ -29,7 +31,7 @@ const (
 type WhereStm struct {
 	Field string
 	Op    WhereOp
-	Value interface{}
+	Value any
 }
 
 // BuildWhere create a complete where statement to be used on select, delete, count and update queries

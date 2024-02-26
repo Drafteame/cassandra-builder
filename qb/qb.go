@@ -3,43 +3,45 @@ package qb
 import (
 	"github.com/gocql/gocql"
 
-	models "github.com/Drafteame/cassandra-builder/qb/models"
-	"github.com/Drafteame/cassandra-builder/qb/qcount"
-	delete2 "github.com/Drafteame/cassandra-builder/qb/qdelete"
-	"github.com/Drafteame/cassandra-builder/qb/qinsert"
-	_select "github.com/Drafteame/cassandra-builder/qb/qselect"
-	"github.com/Drafteame/cassandra-builder/qb/qupdate"
+	"github.com/Drafteame/cassandra-builder/qb/models"
+	"github.com/Drafteame/cassandra-builder/session"
 )
 
-// Client is the main cassandra client abstraction to work with the database
-type Client interface {
-	// Select start a select query
-	Select(f ...string) *_select.Query
+type client struct {
+	canRestart     bool
+	config         models.Config
+	session        *gocql.Session
+	sessionCreator session.Creator
+}
 
-	// Insert start a new insert query statement
-	Insert(f ...string) *qinsert.Query
+var _ Client = &client{}
 
-	// Update start an update query statement
-	Update(t string) *qupdate.Query
+// NewClient creates a new cassandra client manager from config
+func NewClient(conf models.Config, opts ...Option) (Client, error) {
+	copts := options{sessionCreator: session.Create}
 
-	// Delete start a new delete query statement
-	Delete() *delete2.Query
+	for _, opt := range opts {
+		opt(&copts)
+	}
 
-	// Count start new count query statement
-	Count() *qcount.Query
+	sess, err := copts.sessionCreator(conf)
+	if err != nil {
+		return nil, err
+	}
 
-	// Session return the plain session object to build some direct query
-	Session() *gocql.Session
+	return &client{
+		session:        sess,
+		config:         conf,
+		canRestart:     true,
+		sessionCreator: copts.sessionCreator,
+	}, nil
+}
 
-	// Debug return an assertion for debugging
-	Debug() bool
-
-	// Restart should close and start a new connection.
-	Restart() error
-
-	// Config return current client configuration
-	Config() models.Config
-
-	// Close ends cassandra connection pool
-	Close()
+// NewClientWithSession creates a new cassandra client manager from a given session.
+func NewClientWithSession(sess *gocql.Session, conf models.Config) Client {
+	return &client{
+		session:    sess,
+		config:     conf,
+		canRestart: false,
+	}
 }

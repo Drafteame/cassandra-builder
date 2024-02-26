@@ -1,6 +1,8 @@
 package errors
 
-import "errors"
+import (
+	"errors"
+)
 
 var (
 	ErrNilBinding              = errors.New("cassandra-builder: nil bind is not allowed")
@@ -9,5 +11,4 @@ var (
 	ErrNoSliceOfStructsBinding = errors.New("cassandra-builder: bind value should be a slice of structs")
 	ErrClosedConnection        = errors.New("cassandra-builder: can execute on closed connection")
 	ErrNilIterator             = errors.New("cassandra-builder: nil iterator is not allowed")
-	ErrParsing                 = errors.New("cassandra-builder: error parsing row")
 )

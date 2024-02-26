@@ -1,12 +1,13 @@
-name: Cleanup caches by a branch
+name: Main Cleanup Cache
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
+    branches:
+      - main
 
 jobs:
-  cleanup:
+  clean_cache:
+    name: Cleanup main cache
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -17,7 +18,7 @@ jobs:
           gh extension install actions/gh-actions-cache
 
           REPO=${{ github.repository }}
-          BRANCH="refs/pull/${{ github.event.pull_request.number }}/merge"
+          BRANCH="main"
 
           echo "Fetching list of cache key"
           cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH | cut -f 1 )
