@@ -1,3 +1,35 @@
+## v0.12.0 (2024-02-27)
+
+
+- build(deps): bump actions/setup-go from 4 to 5 (#24)
+- Bumps [actions/setup-go](https://github.com/actions/setup-go) from 4 to 5.
+- [Release notes](https://github.com/actions/setup-go/releases)
+- [Commits](https://github.com/actions/setup-go/compare/v4...v5)
+
+---
+updated-dependencies:
+- dependency-name: actions/setup-go
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+- build(deps): bump actions/setup-python from 4 to 5 (#23)
+- Bumps [actions/setup-python](https://github.com/actions/setup-python) from 4 to 5.
+- [Release notes](https://github.com/actions/setup-python/releases)
+- [Commits](https://github.com/actions/setup-python/compare/v4...v5)
+
+---
+updated-dependencies:
+- dependency-name: actions/setup-python
+  dependency-type: direct:production
+  update-type: version-update:semver-major
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>
+Co-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>
+
 ## v0.11.1 (2023-04-10)
 
 
